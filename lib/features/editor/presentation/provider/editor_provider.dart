@@ -7,7 +7,7 @@ class EditorProvider with ChangeNotifier {
   final MemeRepository repository;
   late Meme _currentMeme;
 
-  EditorProvider({required this.repository});
+  EditorProvider(this.repository);
 
   final List<MemeElement> _elements = [];
   final List<List<MemeElement>> _history = [];

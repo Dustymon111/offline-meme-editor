@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:meme_editor/features/editor/presentation/pages/export_page.dart';
 import 'package:meme_editor/features/editor/presentation/provider/editor_provider.dart';
 import 'package:meme_editor/features/editor/presentation/widgets/draggable_element.dart';
 import 'package:path_provider/path_provider.dart';
@@ -289,14 +290,15 @@ class EditorPage extends StatelessWidget {
             onPressed: () => _pickSticker(context, provider),
           ),
           IconButton(
-            icon: const Icon(Icons.download),
-            tooltip: 'Save to Gallery',
-            onPressed: () => _saveMemeToGallery(context),
-          ),
-          IconButton(
             icon: const Icon(Icons.share),
             tooltip: 'Share Meme',
-            onPressed: () => _shareMeme(context),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) =>
+                    ExportPage(imageUrl: imageUrl, elements: provider.elements),
+              ),
+            ),
           ),
         ],
       ),

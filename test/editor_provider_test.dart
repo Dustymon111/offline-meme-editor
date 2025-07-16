@@ -29,7 +29,7 @@ void main() {
 
   setUp(() {
     mockRepository = MockMemeRepository();
-    provider = EditorProvider(repository: mockRepository);
+    provider = EditorProvider(mockRepository);
   });
 
   test('addElement should add element and save to history', () {

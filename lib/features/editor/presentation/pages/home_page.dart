@@ -112,7 +112,7 @@ class _HomePageState extends State<HomePage> {
                                     builder: (_) => ChangeNotifierProvider(
                                       create: (_) {
                                         final provider = EditorProvider(
-                                          repository: sl<MemeRepository>(),
+                                          sl<MemeRepository>(),
                                         );
                                         provider.loadMemeById(meme.id);
                                         return provider;

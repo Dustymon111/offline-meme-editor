@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meme_editor/features/editor/data/repositories/meme_repository_impl.dart';
 import 'package:meme_editor/features/editor/domain/repositories/meme_repository.dart';
 import 'package:meme_editor/features/editor/presentation/pages/home_page.dart';
+import 'package:meme_editor/features/editor/presentation/provider/editor_provider.dart';
 import 'package:meme_editor/features/editor/presentation/provider/home_provider.dart';
 import 'package:meme_editor/features/editor/presentation/provider/meme_provider.dart';
 import 'package:meme_editor/features/editor/presentation/provider/theme_provider.dart';
@@ -37,6 +38,9 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => HomeProvider(sl<MemeRepository>()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => EditorProvider(sl<MemeRepository>()),
         ),
         ChangeNotifierProvider(
           create: (_) => ThemeProvider(isSystemDark: isSystemDark),
