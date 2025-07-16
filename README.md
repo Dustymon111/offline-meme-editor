@@ -21,7 +21,7 @@
    ```bash
    flutter pub get
    ```
-3. **Generate necessary files**
+3. **Generate necessary files**<br>
     This project uses build_runner to generate:
     - Hive type adapters for local caching
     - Mockito mocks for unit testing
