@@ -6,7 +6,7 @@
 - **Dart SDK**
 - **Android Studio**, **VS Code**, or any Flutter-compatible IDE
 - A connected **Android device** or **emulator**
-- (Optional) Internet access to fetch meme templates
+- Internet access to fetch meme templates
 
 ---
 
