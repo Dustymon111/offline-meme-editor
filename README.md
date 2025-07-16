@@ -16,18 +16,23 @@
    ```bash
    git clone https://github.com/Dustymon111/offline-meme-editor.git
    cd offline-meme-editor
+   ```
 2. **Install dependencies**
    ```bash
    flutter pub get
+   ```
 3. **Generate necessary files**
     This project uses build_runner to generate:
     - Hive type adapters for local caching
     - Mockito mocks for unit testing
    ```bash
    flutter pub run build_runner build
-   
-🛠️ **Run the App**
+   ```
+### 🛠️ Run the App
   ```bash
     flutter run
-
-✅ **Run Tests**
+   ```
+### ✅ Run Tests
+   ```bash
+    flutter test
+   ```
