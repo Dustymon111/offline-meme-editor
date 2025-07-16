@@ -1,12 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:meme_editor/features/editor/domain/repositories/meme_repository.dart';
 import 'package:meme_editor/features/editor/presentation/provider/editor_provider.dart';
 import 'package:meme_editor/features/editor/presentation/provider/home_provider.dart';
 import 'package:meme_editor/features/editor/presentation/provider/theme_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:meme_editor/injection/injection.dart';
 import 'editor_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -111,9 +109,10 @@ class _HomePageState extends State<HomePage> {
                                   MaterialPageRoute(
                                     builder: (_) => ChangeNotifierProvider(
                                       create: (_) {
-                                        final provider = EditorProvider(
-                                          sl<MemeRepository>(),
-                                        );
+                                        final provider =
+                                            Provider.of<EditorProvider>(
+                                              context,
+                                            );
                                         provider.loadMemeById(meme.id);
                                         return provider;
                                       },

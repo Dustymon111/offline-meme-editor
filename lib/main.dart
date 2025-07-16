@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'features/editor/domain/entities/meme.dart';
 import 'features/editor/domain/entities/meme_element.dart';
-import 'injection/injection.dart';
+import 'core/injection/injection.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
