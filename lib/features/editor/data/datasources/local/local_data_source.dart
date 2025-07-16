@@ -8,6 +8,7 @@ import '../../../domain/entities/meme.dart';
 abstract class LocalDataSource {
   Future<void> cacheMemes(List<Meme> memes);
   List<Meme> getCachedMemes();
+  Future<void> updateMeme(Meme meme);
 }
 
 /// Implementation
@@ -19,8 +20,15 @@ class LocalDataSourceImpl implements LocalDataSource {
   @override
   Future<void> cacheMemes(List<Meme> memes) async {
     for (final meme in memes) {
-      await memeBox.put(meme.id, meme);
-      debugPrint('[Hive] Cached meme: ${meme.id}, path: ${meme.imagePath}');
+      final existing = memeBox.get(meme.id);
+      if (existing != null && existing.imagePath == meme.imagePath) {
+        final preserved = meme.copyWith(elements: existing.elements);
+        await memeBox.put(meme.id, preserved);
+        debugPrint('[Hive] Updated meme with preserved elements: ${meme.id}');
+      } else {
+        await memeBox.put(meme.id, meme);
+        debugPrint('[Hive] Cached new meme: ${meme.id}');
+      }
     }
   }
 
@@ -32,5 +40,17 @@ class LocalDataSourceImpl implements LocalDataSource {
       debugPrint('[File Check] Exists: ${File(meme.imagePath).existsSync()}');
     }
     return memes;
+  }
+
+  @override
+  Future<void> updateMeme(Meme meme) async {
+    await memeBox.put(meme.id, meme);
+    debugPrint('[Hive] Updated meme: ${meme.id}');
+    debugPrint(
+      '[Hive] Meme Elements: ${meme.elements[meme.elements.length - 1].content.toString()}',
+    );
+    debugPrint(
+      '[Hive] Meme Elements Count: ${meme.elements.length.toString()}',
+    );
   }
 }

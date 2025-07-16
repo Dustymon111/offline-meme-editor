@@ -14,11 +14,14 @@ class MemeRepositoryImpl implements MemeRepository {
 
   MemeRepositoryImpl({required this.remote, required this.local});
 
-  Future<Meme> memeFromTemplate(MemeTemplate template) async {
+  // cache images by downloading images manually
+  Future<Meme> _memeFromTemplate(
+    MemeTemplate template,
+    List<Meme> existingMemes,
+  ) async {
     final dir = await getApplicationDocumentsDirectory();
-    final fileName = '${template.name.hashCode}.jpg'; // unique file name
+    final fileName = '${template.name.hashCode}.jpg';
     final filePath = '${dir.path}/$fileName';
-
     final file = File(filePath);
 
     if (!file.existsSync()) {
@@ -31,12 +34,22 @@ class MemeRepositoryImpl implements MemeRepository {
         debugPrint('[Image Download] Saved ${template.name} to $filePath');
       } catch (e) {
         debugPrint('[Image Download Error] $e');
+        throw Exception('Failed to download meme image: $e');
       }
     } else {
       debugPrint('[Image Cache] Using existing file: $filePath');
     }
 
-    return Meme(id: template.name, imagePath: file.path, elements: []);
+    final existing = existingMemes.firstWhere(
+      (m) => m.id == template.name,
+      orElse: () => Meme(id: template.name, imagePath: filePath, elements: []),
+    );
+
+    return Meme(
+      id: template.name,
+      imagePath: filePath,
+      elements: existing.elements,
+    );
   }
 
   // cache
@@ -52,8 +65,14 @@ class MemeRepositoryImpl implements MemeRepository {
       final remoteTemplates = await remote.fetchMemes();
       debugPrint("Fetched ${remoteTemplates.length} templates.");
 
+      //Load cached memes only once
+      final existingCached = local.getCachedMemes();
+
+      //Pass it into the loop
       final memesToCache = await Future.wait(
-        remoteTemplates.map((template) => memeFromTemplate(template)),
+        remoteTemplates.map(
+          (template) => _memeFromTemplate(template, existingCached),
+        ),
       );
 
       await local.cacheMemes(memesToCache);
@@ -63,5 +82,10 @@ class MemeRepositoryImpl implements MemeRepository {
       debugPrint('Error fetching meme templates: $e');
       rethrow;
     }
+  }
+
+  @override
+  Future<void> updateMeme(Meme meme) async {
+    await local.updateMeme(meme);
   }
 }

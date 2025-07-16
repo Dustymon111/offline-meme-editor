@@ -1,5 +1,5 @@
+import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
-import 'package:http/http.dart' as http;
 import 'package:hive/hive.dart';
 import 'package:meme_editor/features/editor/data/datasources/local/local_data_source.dart';
 import 'package:meme_editor/features/editor/data/datasources/remote/remote_data_source.dart';
@@ -13,12 +13,12 @@ final sl = GetIt.instance;
 class Injection {
   static Future<void> init(Box<Meme> memeBox) async {
     // ✅ Core Dependencies
-    sl.registerLazySingleton<http.Client>(() => http.Client());
-    sl.registerSingleton<Box<Meme>>(memeBox); // You pass this from main()
+    sl.registerLazySingleton<Dio>(() => Dio());
+    sl.registerSingleton<Box<Meme>>(memeBox);
 
     // ✅ Data Sources
     sl.registerLazySingleton<RemoteDataSource>(
-      () => RemoteDataSourceImpl(sl<http.Client>()),
+      () => RemoteDataSourceImpl(sl<Dio>()),
     );
 
     sl.registerLazySingleton<LocalDataSource>(

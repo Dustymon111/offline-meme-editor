@@ -28,12 +28,16 @@ class MemeElement {
   @HiveField(4)
   final String content;
 
+  @HiveField(5)
+  final double? scale;
+
   MemeElement({
     this.id,
     required this.type,
     required this.x,
     required this.y,
     required this.content,
+    this.scale = 1.0,
   });
 
   factory MemeElement.fromJson(Map<String, dynamic> json) {
@@ -45,6 +49,7 @@ class MemeElement {
       x: (json['x'] as num).toDouble(),
       y: (json['y'] as num).toDouble(),
       content: json['content'],
+      scale: (json['scale'] as double).toDouble(),
     );
   }
 
@@ -54,6 +59,7 @@ class MemeElement {
     'x': x,
     'y': y,
     'content': content,
+    'scale': scale,
   };
 
   MemeElement copyWith({
@@ -62,6 +68,7 @@ class MemeElement {
     double? x,
     double? y,
     String? content,
+    double? scale,
   }) {
     return MemeElement(
       id: id ?? this.id,
@@ -69,6 +76,7 @@ class MemeElement {
       x: x ?? this.x,
       y: y ?? this.y,
       content: content ?? this.content,
+      scale: scale ?? this.scale,
     );
   }
 }

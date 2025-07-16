@@ -31,4 +31,12 @@ class Meme {
     'imagePath': imagePath,
     'elements': elements.map((e) => e.toJson()).toList(),
   };
+
+  Meme copyWith({String? id, String? imagePath, List<MemeElement>? elements}) {
+    return Meme(
+      id: id ?? this.id,
+      imagePath: imagePath ?? this.imagePath,
+      elements: elements ?? this.elements,
+    );
+  }
 }

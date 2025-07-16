@@ -1,5 +1,4 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import 'package:meme_editor/features/editor/domain/entities/meme_template.dart';
 
 /// Abstract interface
@@ -9,22 +8,23 @@ abstract class RemoteDataSource {
 
 /// Implementation
 class RemoteDataSourceImpl implements RemoteDataSource {
-  final http.Client client;
+  final Dio dio;
 
-  RemoteDataSourceImpl(this.client);
+  RemoteDataSourceImpl(this.dio);
 
   @override
   Future<List<MemeTemplate>> fetchMemes() async {
-    final response = await client.get(
-      Uri.parse('https://api.imgflip.com/get_memes'),
-    );
+    try {
+      final response = await dio.get('https://api.imgflip.com/get_memes');
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final memes = data['data']['memes'] as List;
-      return memes.map((e) => MemeTemplate.fromJson(e)).toList();
-    } else {
-      throw Exception('Failed to load meme templates');
+      if (response.statusCode == 200 && response.data['success'] == true) {
+        final memes = response.data['data']['memes'] as List;
+        return memes.map((e) => MemeTemplate.fromJson(e)).toList();
+      } else {
+        throw Exception('Failed to load meme templates');
+      }
+    } catch (e) {
+      throw Exception('Dio error fetching memes: $e');
     }
   }
 }

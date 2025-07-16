@@ -1,11 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:meme_editor/features/editor/domain/entities/meme.dart';
-import 'package:meme_editor/features/editor/domain/entities/meme_template.dart';
+import 'package:meme_editor/features/editor/domain/repositories/meme_repository.dart';
+import 'package:meme_editor/features/editor/presentation/provider/editor_provider.dart';
 import 'package:meme_editor/features/editor/presentation/provider/home_provider.dart';
+import 'package:meme_editor/features/editor/presentation/provider/theme_provider.dart';
 import 'package:provider/provider.dart';
-
+import 'package:meme_editor/injection/injection.dart';
 import 'editor_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -21,7 +22,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<HomeProvider>(context, listen: false).init();
     });
   }
@@ -36,19 +37,24 @@ class _HomePageState extends State<HomePage> {
             builder: (_, provider, __) => IconButton(
               icon: Icon(provider.isOnline ? Icons.cloud : Icons.cloud_off),
               tooltip: provider.isOnline ? 'Online Mode' : 'Offline Mode',
-              onPressed: () => {provider.toggleOnlineMode()},
+              onPressed: () => {provider.toggleOnlineMode(context)},
+            ),
+          ),
+          Consumer<ThemeProvider>(
+            builder: (_, themeProvider, __) => Switch(
+              value: themeProvider.isDarkMode,
+              onChanged: (val) {
+                themeProvider.toggleTheme(val);
+              },
             ),
           ),
         ],
       ),
       body: Consumer<HomeProvider>(
         builder: (context, provider, _) {
-          final isOnline = provider.isOnline;
           final searchQuery = provider.searchQuery;
 
-          final memes = isOnline
-              ? provider.filteredTemplates
-              : provider.filteredCachedMemes;
+          final memes = provider.filteredCachedMemes;
 
           return Column(
             children: [
@@ -76,7 +82,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
 
-              // 🔄 Swipe-to-Refresh + Grid
+              // Swipe-to-Refresh
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () => provider.fetchTemplates(),
@@ -96,30 +102,30 @@ class _HomePageState extends State<HomePage> {
                           itemCount: memes.length,
                           itemBuilder: (context, index) {
                             final meme = memes[index];
-                            final imagePath = isOnline
-                                ? (meme as MemeTemplate).url
-                                : (meme as Meme).imagePath;
+                            final imagePath = meme.imagePath;
 
                             return GestureDetector(
                               onTap: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => EditorPage(
-                                      imageUrl: imagePath,
-                                      isOnline: isOnline,
+                                    builder: (_) => ChangeNotifierProvider(
+                                      create: (_) {
+                                        final provider = EditorProvider(
+                                          repository: sl<MemeRepository>(),
+                                        );
+                                        provider.loadMemeById(meme.id);
+                                        return provider;
+                                      },
+                                      child: EditorPage(
+                                        imageUrl: meme.imagePath,
+                                        isOnline: false,
+                                      ),
                                     ),
                                   ),
                                 );
                               },
-                              child: isOnline
-                                  ? Image.network(
-                                      imagePath,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) =>
-                                          const Icon(Icons.broken_image),
-                                    )
-                                  : File(imagePath).existsSync()
+                              child: File(imagePath).existsSync()
                                   ? Image.file(
                                       File(imagePath),
                                       fit: BoxFit.cover,
