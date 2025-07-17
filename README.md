@@ -36,3 +36,8 @@
    ```bash
     flutter test
    ```
+
+## 🚀 Build APK
+   ```bash
+    flutter build apk
+   ```
